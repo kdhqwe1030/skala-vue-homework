@@ -1,8 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import WeatherHomeView from '../views/WeatherHomeView.vue'
-import WeatherAboutView from '@/views/WeatherAboutView.vue'
-import NotFoundView from '@/views/NotFoundView.vue'
-import WeatherDetailView from '@/views/WeatherDetailView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -10,22 +6,22 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: WeatherHomeView,
+      component: () => import('../views/WeatherHomeView.vue'),
     },
     {
       path: '/about',
       name: 'about',
-      component: WeatherAboutView,
+      component: () => import('@/views/WeatherAboutView.vue'),
     },
     {
       path: '/weather/:cityId',
       name: 'weather',
-      component: WeatherDetailView,
+      component: () => import('@/views/WeatherDetailView.vue'),
     },
     {
       path: '/:pathMatch(.*)*',
       name: 'NotFound',
-      component: NotFoundView,
+      component: () => import('@/views/NotFoundView.vue'),
     },
   ],
 })
