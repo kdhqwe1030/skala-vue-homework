@@ -28,14 +28,13 @@
 
 ## 주요 기능
 
-| 기능           | 설명                                       | 스크린샷 |
-| -------------- | ------------------------------------------ | -------- |
-| 메인 대시보드  | 도시 검색 + 지역 필터 + 날씨 카드 리스트   | `!사진`  |
-| 검색 결과 없음 | 검색어와 일치하는 도시가 없을 때 안내 문구 | `!사진`  |
-| 상세 페이지    | 도시별 실시간 기온/상태 + 5일 예보         | `!사진`  |
-| 단위 전환      | 상단 UnitToggler로 섭씨 ↔ 화씨 전환        | `!사진`  |
-| 서비스 소개    | About 페이지                               | `!사진`  |
-
+| 기능 | 설명 | 스크린샷 |
+| --- | --- | --- |
+| 메인 대시보드 | 도시 검색 + 지역 필터 + 날씨 카드 리스트 | <img width="578" height="777" alt="image" src="https://github.com/user-attachments/assets/1054fc87-8c68-42bd-a2e8-6d1c91738e3e" /> |
+| 검색 결과 없음 | 검색어와 일치하는 도시가 없을 때 안내 문구 | <img width="785" height="802" alt="image" src="https://github.com/user-attachments/assets/9df2a865-f4af-4e35-91bc-d19ebec5fd2a" /> |
+| 상세 페이지 | 도시별 실시간 기온/상태 + 5일 예보 | <img width="510" height="764" alt="image" src="https://github.com/user-attachments/assets/af0968dc-8950-49bd-886a-aeaf6e5191f6" /> |
+| 단위 전환 | 상단 UnitToggler로 섭씨 ↔ 화씨 전환 | <img width="537" height="727" alt="image" src="https://github.com/user-attachments/assets/84717e5b-e82e-4d91-9516-95324a59ac8a" /> |
+| 서비스 소개 | About 페이지 | <img width="567" height="406" alt="image" src="https://github.com/user-attachments/assets/7aecde2b-9966-4e60-a7b2-c9aee393b9ed" /> |
 ## 구현
 
 과제 요구사항과 실제 구현 위치를 매핑한 표입니다.
@@ -122,7 +121,8 @@
 
 `npm run lint`(oxlint + eslint) 실행 결과 에러 0건을 확인했습니다.
 
-`!사진`
+<img width="423" height="123" alt="스크린샷 2026-08-27 오후 5 17 32" src="https://github.com/user-attachments/assets/e7828fc8-89cf-4791-91ab-7b05ac665595" />
+
 
 ### Forecast API를 활용한 5일 예보 / 오늘 시간대 예보 구현
 
@@ -132,13 +132,30 @@ OpenWeatherMap의 `/forecast`는 5일치 데이터를 3시간 간격으로 내�
 - **5일 일별 요약**: `dt_txt`의 날짜(`YYYY-MM-DD`)를 key로 3시간 단위 데이터를 그룹핑한 뒤, 그룹별 최고/최저 기온(`temp_max`/`temp_min`)을 계산하고 대표 날씨는 정오(`12:00:00`) 데이터를 우선 사용하는 `dailySummary` computed (`WeatherForecast.vue`)
 - **UTC → 로컬 시간 변환**: OpenWeatherMap이 내려주는 `dt`는 UTC 기준 Unix timestamp라 그대로 쓰면 시간대가 어긋나므로, `toLocalTimeStr`에서 `new Date(dt * 1000)`으로 변환 후 `getHours()`/`getMinutes()`로 로컬 시간 기준 "오전/오후 N시" 문자열을 만들어 표시 (`WeatherForecast.vue`)
 
-`!사진`
+```js
+const toLocalTimeStr = (dt) => {
+  const date = new Date(dt * 1000)
+  const hours = date.getHours()
+  const minutes = date.getMinutes()
+
+  const period = hours < 12 ? '오전' : '오후'
+  let displayHour = hours % 12
+  if (displayHour === 0) displayHour = 12
+
+  if (minutes === 0) return `${period} ${displayHour}시`
+
+  const displayMinutes = String(minutes).padStart(2, '0')
+  return `${period} ${displayHour}:${displayMinutes}`
+}
+```
+
 
 ### 외부 UI 라이브러리(Element Plus) 적용
 
 위 `todayForecast`, `dailySummary` 두 집계 함수는 API 응답을 받은 뒤 연산을 거쳐야 화면에 표시할 수 있어서, 데이터가 준비되기 전까지 빈 화면이 노출되는 구간이 생깁니다. 이 구간에 Element Plus의 `el-skeleton`을 적용해 로딩 중임을 알리고, 데이터가 채워질 때 레이아웃이 갑자기 밀리는 현상을 방지했습니다 (`WeatherForecast.vue`의 `isLoading` 상태와 연동).
 
-`!사진`
+<img width="1956" height="986" alt="image" src="https://github.com/user-attachments/assets/739c5cdc-21f6-4a92-b735-86c7ec9b4f66" />
+
 
 ## 트러블슈팅
 
@@ -182,13 +199,14 @@ onMounted(() => {
 
 ### Vercel 배포가 Blocked로 뜨는 문제 (git author 이메일 불일치)
 
-!사진
+<img width="1382" height="112" alt="스크린샷 2026-08-27 오후 5 20 55" src="https://github.com/user-attachments/assets/8404b5c8-6700-4458-9d53-37f9c9bafded" />
 
 vercel.json을 추가하고 push했는데, 같은 브랜치인데도 이전 커밋(`7a75ecf`)은 Blocked, 최신 커밋(`f182967`)은 Ready로 뜨는 상황이 발생했다.
 
 원인은 git author 이메일이었다. `git config --global user.email`을 설정하기 전에 만든 커밋은 GitHub 계정에 연결 안 된 이메일로 기록돼 있었고, Vercel은 GitHub App 연동으로 "이 커밋을 만든 사람이 배포 권한이 있는지"를 author 이메일 기준으로 판단하다보니 예전 커밋은 Blocked로 막힌 것으로 보인다. 이후 `git commit --amend --reset-author`로 author 이메일을 GitHub 계정 이메일과 맞춘 뒤엔 정상적으로 Ready로 배포됐다.
 
-!사진
+<img width="577" height="100" alt="스크린샷 2026-08-27 오후 5 21 23" src="https://github.com/user-attachments/assets/283e759d-79f7-4f49-a1fa-883edf923bc4" />
+
 
 ---
 
