@@ -14,7 +14,6 @@ loadAllWeather()
         <router-view />
       </div>
     </main>
-    <!-- <StoreCounter /> -->
   </div>
 </template>
 <style>
